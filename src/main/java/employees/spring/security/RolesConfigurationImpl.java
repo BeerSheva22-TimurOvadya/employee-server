@@ -11,8 +11,9 @@ import telran.spring.security.RolesConfiguration;
 public class RolesConfigurationImpl implements RolesConfiguration{
 	@Override
 	public void configure(HttpSecurity httpSecurity) throws Exception {
-		httpSecurity.authorizeHttpRequests(requests -> requests.requestMatchers(HttpMethod.OPTIONS).permitAll().
-				requestMatchers(HttpMethod.GET).authenticated()
+		httpSecurity.authorizeHttpRequests(requests -> requests.requestMatchers(HttpMethod.OPTIONS).permitAll()
+				.requestMatchers("/websocket/employees/**").permitAll()
+				.requestMatchers(HttpMethod.GET).authenticated()
 				.anyRequest().hasRole("ADMIN"));
 	}
 }
