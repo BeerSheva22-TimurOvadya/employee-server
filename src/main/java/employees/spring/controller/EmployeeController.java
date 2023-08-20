@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import org.springframework.web.bind.annotation.RestController;
 
 import employees.spring.model.Employee;
@@ -33,7 +32,7 @@ public class EmployeeController {
 	@PostMapping
 	public Employee addEmployee(@RequestBody @Valid Employee employee) {
 		Long id = employee.getId();
-		if(id != null ) {
+		if (id != null) {
 			log.warn("exists id {} from client", id);
 			employee.setId(null);
 		}
@@ -45,8 +44,12 @@ public class EmployeeController {
 	@GetMapping
 	public List<Employee> getEmployees() {
 		List<Employee> empls = service.getEmployees();
-		log.debug("All employees are received");
+		log.trace("All employees are received {}", empls);
 		return empls;
+	}
+	@GetMapping("/{id}")
+	public Employee getEmployee(@PathVariable long id) {
+		return service.getEmployee(id);
 	}
 
 
@@ -59,7 +62,7 @@ public class EmployeeController {
 	@PutMapping("{id}")
 	public Employee updateEmployee(@PathVariable int id, @RequestBody @Valid Employee empl) {
 		if (empl.getId() != id) {
-			throw new IllegalArgumentException("id doesn't exists");
+			throw new IllegalArgumentException("id doesn't exist");
 		}
 		Employee emplUpdated = service.updateEmployee(empl);
 		log.debug("Employee with id {} was updated", id);

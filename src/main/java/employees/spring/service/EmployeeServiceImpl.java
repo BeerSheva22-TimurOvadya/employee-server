@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +34,7 @@ public class EmployeeServiceImpl implements EmployeeService, EmployeesPersistanc
 	WriteLock writeLock = lock.writeLock();
 	private Map<Long, Employee> mapEmployee = new HashMap<Long, Employee>();
 	
-	
-	private Long generateId() {
+	private  Long generateId() {
 		ThreadLocalRandom random = ThreadLocalRandom.current();
 		long randomId;
 		do {
@@ -44,11 +44,13 @@ public class EmployeeServiceImpl implements EmployeeService, EmployeesPersistanc
 	}
 	
 	@Override
-	public Employee addEmployee(Employee employee) {	
+	public Employee addEmployee(Employee employee) {
+		
 		writeLock.lock();
 		if (employee.getId() == null) {
 			employee.setId(generateId());
 		}
+			
 		try {
 			Employee res = mapEmployee.putIfAbsent(employee.getId(), employee);
 			if (res != null) {
@@ -62,7 +64,7 @@ public class EmployeeServiceImpl implements EmployeeService, EmployeesPersistanc
 
 	@Override
 	public  List<Employee> getEmployees() {
-		readLock.lock();		
+		readLock.lock();
 		try {
 			return new ArrayList<Employee>(mapEmployee.values());
 		} finally {
@@ -76,7 +78,7 @@ public class EmployeeServiceImpl implements EmployeeService, EmployeesPersistanc
 		try {
 			Employee empl = mapEmployee.remove(id);
 			if (empl == null) {
-				throw new NotFoundException("Not found " + id);
+				throw new NotFoundException("Not found" + id);
 			}
 		} finally {
 			writeLock.unlock();
@@ -85,17 +87,15 @@ public class EmployeeServiceImpl implements EmployeeService, EmployeesPersistanc
 
 	@Override
 	public Employee updateEmployee(Employee empl) {
-		
 		writeLock.lock();
 		try {
 			if (!mapEmployee.containsKey(empl.getId())) {
-				throw new NotFoundException("Employee with id " + empl.getId() + " was not found");
+				throw new NotFoundException("Not found " + empl.getId() + " was found");
 			}
 			Employee emplFound = mapEmployee.put(empl.getId(), empl);			
 			return emplFound;
 		} finally {
 			writeLock.unlock();
-			
 
 		}
 	}
@@ -136,6 +136,15 @@ public class EmployeeServiceImpl implements EmployeeService, EmployeesPersistanc
 			throw new RuntimeException(e.getMessage());
 		}
 		return res;
+	}
+
+	@Override
+	public Employee getEmployee(long id) {
+		Employee empl = mapEmployee.get(id);
+		if(empl == null) {
+			throw new NotFoundException("Not found employee ");
+		}
+		return null;
 	}
 
 }
